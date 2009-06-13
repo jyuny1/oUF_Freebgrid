@@ -18,7 +18,6 @@ libs\UTF8\utf8data.lua
 
 oUF_Freebpets.xml
 oUF_FreebMtargets.xml
-Buffs.lua
-##RaidDebuff.lua
+tags.lua
 oUF_Freebgrid.lua
 oUF_HealComm.lua
