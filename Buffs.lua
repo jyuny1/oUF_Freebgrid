@@ -1,0 +1,20 @@
+L = {
+  -- spells
+  ["Prayer of Mending"] = GetSpellInfo(33076),
+  ["Gift of the Naaru"] = GetSpellInfo(59542),
+  ["Renew"] = GetSpellInfo(139),
+  ["Power Word: Shield"] = GetSpellInfo(17),
+  ["Weakened Soul"] = GetSpellInfo(6788),
+  ["Prayer of Shadow Protection"] = GetSpellInfo(27683),
+  ["Shadow Protection"] = GetSpellInfo(976),
+  ["Prayer of Fortitude"] = GetSpellInfo(21562),
+  ["Power Word: Fortitude"] = GetSpellInfo(1243),
+  ["Fear Ward"] = GetSpellInfo(6346),
+  ["Lifebloom"] = GetSpellInfo(33763),
+  ["Rejuvenation"] = GetSpellInfo(774),
+  ["Regrowth"] = GetSpellInfo(8936),
+  ["Wild Growth"] = GetSpellInfo(48438),
+  ["Tree of Life"] = GetSpellInfo(33891),
+  ["Gift of the Wild"] = GetSpellInfo(21849),
+  ["Horn of Winter"] = GetSpellInfo(57623),
+}
