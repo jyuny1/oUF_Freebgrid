@@ -22,7 +22,6 @@ local playerClass = select(2, UnitClass("player"))
 local reverseColors = false	-- Reverse Units color
 local highlight = true		-- MouseOver Highlight?
 local debuffhighlight = true	-- use debuffhighlight?
-local combatfeedback = true	-- show combat feedback?
 local indicators = true 	-- Class Indicators?
 local readycheck = true		-- show ready check?
 
@@ -637,73 +636,58 @@ local func = function(self, unit)
     self.DebuffHighlightUseTexture = true
   end
 
-  -- combat feedback
-  if ((combatfeedback) and (IsAddOnLoaded('oUF_CombatFeedback'))) then
-    local cbft = self:CreateFontString(nil, "OVERLAY")
-    cbft:SetPoint("CENTER", self, "CENTER")
-    cbft:SetFont(font, 10)
-    self.CombatFeedbackText = cbft
-    --[[
-    self.CombatFeedbackText.ignoreImmune = true -- ignore 'immune' reports
-    self.CombatFeedbackText.ignoreDamage = true -- ignore damage hits, blocks, misses, parries etc.
-    self.CombatFeedbackText.ignoreHeal = true -- ignore heals
-    self.CombatFeedbackText.ignoreEnergize = true -- ignore energize events
-    self.CombatFeedbackText.ignoreOther = true  -- ignore everything else
-    --]]
-    --end
+  -- Leader Icon
+  if(Licon)then
+    self.Leader = self.Health:CreateTexture(nil, "OVERLAY")
+    self.Leader:SetPoint("TOPLEFT", self, -5, 8)
+    self.Leader:SetHeight(16)
+    self.Leader:SetWidth(16)
 
-    -- Leader Icon
-    if(Licon)then
-      self.Leader = self.Health:CreateTexture(nil, "OVERLAY")
-      self.Leader:SetPoint("TOPLEFT", self, -5, 8)
-      self.Leader:SetHeight(16)
-      self.Leader:SetWidth(16)
-
-      self.Assistant = self.Health:CreateTexture(nil, "OVERLAY")
-      self.Assistant:SetPoint("TOPLEFT", self, -5, 8)
-      self.Assistant:SetHeight(16)
-      self.Assistant:SetWidth(16)
-      -- masterlootrt
-      self.MasterLooter = self.Health:CreateTexture(nil, 'OVERLAY')
-      self.MasterLooter:SetPoint('TOPLEFT', self, 10, 9)
-      self.MasterLooter:SetHeight(16)
-      self.MasterLooter:SetWidth(16)
-    end
-
-    -- Raid Icon
-    if(ricon)then
-      self.RaidIcon = self.Health:CreateTexture(nil, "OVERLAY")
-      self.RaidIcon:SetPoint("TOPRIGHT", self, 5, 10)
-      self.RaidIcon:SetHeight(16)
-      self.RaidIcon:SetWidth(16)
-    end
-
-    -- ReadyCheck
-    if ((readycheck) and (IsAddOnLoaded('oUF_ReadyCheck'))) then
-      self.ReadyCheck = self.Health:CreateTexture(nil, "OVERLAY")
-      self.ReadyCheck:SetPoint("CENTER", self, 0, -10)
-      self.ReadyCheck:SetHeight(16)
-      self.ReadyCheck:SetWidth(16)
-      self.ReadyCheck.delayTime = 8
-      self.ReadyCheck.fadeTime = 2
-    end
-
-    if not(self:GetAttribute('unitsuffix') == 'target')then
-      if(indicators)then
-	applyAuraIndicator(self)
-      end
-
-      self.applyHealComm = true
-    end
-
-    self:RegisterEvent('PLAYER_TARGET_CHANGED', ChangedTarget)
-    f:RegisterEvent("UNIT_AURA")
-
-    self:SetAttribute('initial-height', height)
-    self:SetAttribute('initial-width', width)
-
-    return self
+    self.Assistant = self.Health:CreateTexture(nil, "OVERLAY")
+    self.Assistant:SetPoint("TOPLEFT", self, -5, 8)
+    self.Assistant:SetHeight(16)
+    self.Assistant:SetWidth(16)
+    -- masterlootrt
+    self.MasterLooter = self.Health:CreateTexture(nil, 'OVERLAY')
+    self.MasterLooter:SetPoint('TOPLEFT', self, 10, 9)
+    self.MasterLooter:SetHeight(16)
+    self.MasterLooter:SetWidth(16)
   end
+
+  -- Raid Icon
+  if(ricon)then
+    self.RaidIcon = self.Health:CreateTexture(nil, "OVERLAY")
+    self.RaidIcon:SetPoint("TOPRIGHT", self, 5, 10)
+    self.RaidIcon:SetHeight(16)
+    self.RaidIcon:SetWidth(16)
+  end
+
+  -- ReadyCheck
+  if ((readycheck) and (IsAddOnLoaded('oUF_ReadyCheck'))) then
+    self.ReadyCheck = self.Health:CreateTexture(nil, "OVERLAY")
+    self.ReadyCheck:SetPoint("CENTER", self, 0, -10)
+    self.ReadyCheck:SetHeight(16)
+    self.ReadyCheck:SetWidth(16)
+    self.ReadyCheck.delayTime = 8
+    self.ReadyCheck.fadeTime = 2
+  end
+
+  if not(self:GetAttribute('unitsuffix') == 'target')then
+    if(indicators)then
+      applyAuraIndicator(self)
+    end
+
+    self.applyHealComm = true
+  end
+
+  self:RegisterEvent('PLAYER_TARGET_CHANGED', ChangedTarget)
+  f:RegisterEvent("UNIT_AURA")
+
+  self:SetAttribute('initial-height', height)
+  self:SetAttribute('initial-width', width)
+
+  return self
+end
 end
 
 oUF:RegisterStyle("Freebgrid", func)
