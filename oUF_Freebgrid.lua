@@ -572,7 +572,6 @@ local func = function(self, unit)
 
   return self
 end
-end
 
 oUF:RegisterStyle("Freebgrid", func)
 
