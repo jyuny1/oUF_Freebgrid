@@ -237,13 +237,14 @@ local round = function(x, y)
   return math.floor((x * 10 ^ y)+ 0.5) / 10 ^ y
 end
 
+local nameCache = {}
 local updateHealth = function(self, event, unit, bar, current, max)
   local def = max - current
   bar:SetValue(current)
-
   local r, g, b, t
   if UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit) then
-    r, g, b = .3, .3, .3
+    local _, class = UnitClass(unit)
+    t = colors.class[class]
   elseif(UnitIsPlayer(unit)) then
     local _, class = UnitClass(unit)
     t = colors.class[class]
@@ -251,7 +252,18 @@ local updateHealth = function(self, event, unit, bar, current, max)
     -- MainTank target and Party Pet color
     r, g, b = .1, .8, .3
   end
-
+  --[[
+  local r, g, b, t
+  if UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit) then
+  r, g, b = .3, .3, .3
+  elseif(UnitIsPlayer(unit)) then
+  local _, class = UnitClass(unit)
+  t = colors.class[class]
+  else
+  -- MainTank target and Party Pet color
+  r, g, b = .1, .8, .3
+  end
+  --]]
   if(t) then
     r, g, b = t[1], t[2], t[3]
   end
@@ -265,15 +277,54 @@ local updateHealth = function(self, event, unit, bar, current, max)
   end
 
   if(not UnitIsConnected(unit)) then
-    self.Name:SetText('|cffD7BEA5'..'D/C')
+    --self.Name:SetText('|cffD7BEA5'..'D/C')
+    bar.value:SetText('|cffD7BEA5'..'D/C')
+    bar.value:SetAlpha(1)
+
   elseif(UnitIsDead(unit)) then
-    self.Name:SetText('|cffD7BEA5'..'Dead')
+    --self.Name:SetText('|cffD7BEA5'..'Dead')
+    bar.value:SetText('|cffD7BEA5'..'Dead')
+    bar.value:SetAlpha(1)
+
   elseif(UnitIsGhost(unit)) then
-    self.Name:SetText('|cffD7BEA5'..'Ghost')
-  elseif (per > 0.9) then
-    self.Name:SetText(UnitName(unit):utf8sub(1, 3))
+    --self.Name:SetText('|cffD7BEA5'..'Ghost')
+    bar.value:SetText('|cffD7BEA5'..'Ghost')
+    bar.value:SetAlpha(1)
+  elseif (per < 0.9) then
+    bar.value:SetFormattedText('|cffE2799C'.."-%0.1f",math.floor(def/100)/10)
+    bar.value:SetAlpha(1)
   else
+    bar.value:SetAlpha(0)
+    --[[
+    elseif (per > 0.9) then
+    self.Name:SetText(UnitName(unit):utf8sub(1, 3))
+    else
     self.Name:SetFormattedText("-%0.1f",math.floor(def/100)/10)
+    --]]
+  end
+
+  if self.Name then
+    local name = UnitName(unit) or "Unknown"
+    if nameCache[name] then
+      self.Name:SetText(nameCache[name])
+    else
+      local substring
+      for length=#name, 1, -1 do
+	substring = name:utf8sub(1, length)
+	self.Name:SetText(substring)
+	if self.Name:GetStringWidth() <= 38 then
+	  break
+	end
+      end
+      nameCache[name] = substring
+    end
+  end
+
+  -- fixing color for dead/dc units
+  if UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit) then
+    bar.bg:SetVertexColor(r, g, b, 0.2)
+  else
+    bar.bg:SetVertexColor(r, g, b, 1)
   end
 
   bar.bg:SetVertexColor(r, g, b)
@@ -384,7 +435,7 @@ local func = function(self, unit)
   local hpp = hp:CreateFontString(nil, "OVERLAY")
   hpp:SetFont(font, fontsize)
   hpp:SetShadowOffset(1,-1)
-  hpp:SetPoint("CENTER")
+  hpp:SetPoint("CENTER", 0, -8)
   hpp:SetJustifyH("CENTER")
 
   hp.bg = hpbg
@@ -450,7 +501,7 @@ local func = function(self, unit)
 
   -- Name
   local name = hp:CreateFontString(nil, "OVERLAY")
-  name:SetPoint("CENTER")
+  name:SetPoint("CENTER", 0, 6)
   name:SetJustifyH("CENTER")
   name:SetFont(font, fontsize)
   name:SetShadowOffset(1.25, -1.25)
@@ -512,9 +563,9 @@ local func = function(self, unit)
   -- debuffhilight
   if (debuffhighlight and IsAddOnLoaded('oUF_DebuffHighlight')) then
     local dbh = hp:CreateTexture(nil, "OVERLAY")
-    dbh:SetWidth(25)
-    dbh:SetHeight(25)
-    dbh:SetPoint("CENTER", self, "CENTER")
+    dbh:SetWidth(20)
+    dbh:SetHeight(20)
+    dbh:SetPoint("CENTER", self, "CENTER",0 ,-8)
     self.DebuffHighlight = dbh
     self.DebuffHighlightAlpha = .8
     self.DebuffHighlightUseTexture = true
@@ -584,7 +635,9 @@ party:SetManyAttributes('showParty', true,
 'point', 'LEFT', -- Remove to grow vertically
 'xOffset', 5)
 
+--[[ Disable pet bar
 party:SetAttribute("template", "oUF_Freebpets")
+--]]
 
 local raid = {}
 for i = 1, 8 do
